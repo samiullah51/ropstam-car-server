@@ -20,10 +20,33 @@ const addCar = async (req, res) => {
 // @route             GET http://localhost:8000/ropstam-car/api/v1/car
 // @access            Private -- only admin can views all the user's cars
 const getCars = async (req, res) => {
+  // Get the page number from query parameters, default to 1 if not provided
+  const page = parseInt(req.query.page) || 1;
+  // Number of cars per page
+  const limit = 6;
+
   try {
-    // fetch cars from the database  - - in sorted order -- limit is 12
-    const cars = await Car.find().limit(12).sort({ createdAt: -1 });
-    res.status(200).json({ success: true, data: cars, error: null });
+    // Count total number of cars
+    const count = await Car.countDocuments();
+    // Calculate total pages based on the limit
+    const totalPages = Math.ceil(count / limit);
+    // Calculate the number of documents to skip
+    const skip = (page - 1) * limit;
+
+    const cars = await Car.find()
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      data: {
+        cars,
+        currentPage: page,
+        totalPages,
+      },
+      error: null,
+    });
   } catch (err) {
     res.status(500).json({ success: false, data: null, error: err.message });
   }
@@ -33,11 +56,28 @@ const getCars = async (req, res) => {
 // @route             GET http://localhost:8000/ropstam-car/api/v1/car/:userId
 // @access            Private -- a user can view all his own cars only
 const userCars = async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = 6;
+
   try {
+    const count = await Car.countDocuments({ userId: req.params.userId });
+    const totalPages = Math.ceil(count / limit);
+
+    const skip = (page - 1) * limit;
+
     const cars = await Car.find({ userId: req.params.userId })
-      .limit(12)
-      .sort({ createdAt: -1 });
-    res.status(200).json({ success: true, data: cars, error: null });
+      .skip(skip)
+      .limit(limit);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        cars,
+        currentPage: page,
+        totalPages,
+      },
+      error: null,
+    });
   } catch (err) {
     res.status(500).json({ success: false, data: null, error: err.message });
   }
@@ -50,6 +90,7 @@ const carDetails = async (req, res) => {
   try {
     // get details of the car and by whom the car is added, the user details as well
     const car = await Car.findById(req.params.carId).populate("userId");
+
     res.status(200).json({ success: true, data: car, error: null });
   } catch (err) {
     res.status(500).json({ success: false, data: null, error: err.message });
