@@ -1,4 +1,14 @@
 {
+  "name": "ropstam-car-server",
+  "description": "Ropstam car",
+  "version": "1.0.0",
+  "main": "server.js",
+  "devDependencies": {},
+  "author": "",
+  "license": "ISC",
+  "scripts": {
+    "start": "nodemon ./server.js"
+  },
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
