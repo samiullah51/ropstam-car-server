@@ -1,12 +1,37 @@
 const Car = require("../models/car.model");
-
+const { v4: uuidv4 } = require("uuid");
+const { PutObjectCommand } = require("@aws-sdk/client-s3");
+const s3 = require("../utils/s3Config");
 // @description       Add a car
 // @route             POST http://localhost:8000/ropstam-car/api/v1/car
 // @access            Private -- Token is required
 const addCar = async (req, res) => {
   try {
+    const { userId, category, model, madeIn, registrationNo } = req.body;
+    const { image } = req.files;
+
+    let imageURL;
+    if (image) {
+      const imageKey = `ropstam-car/${userId}/${uuidv4()}`;
+      const imageParams = {
+        Bucket: process.env.BUCKET_NAME,
+        Key: imageKey,
+        Body: image[0].buffer,
+        ContentType: image[0].mimetype,
+      };
+      const imageCommand = new PutObjectCommand(imageParams);
+      await s3.send(imageCommand);
+      imageURL = `https://${process.env.BUCKET_NAME}.s3.amazonaws.com/${imageKey}`;
+    }
     // Get all the required fileds from body
-    const newCar = new Car(req.body);
+    const newCar = new Car({
+      userId,
+      category,
+      model,
+      madeIn,
+      registrationNo,
+      image: imageURL,
+    });
     // saved the car into the database
     const savedCar = await newCar.save();
 
