@@ -4,7 +4,7 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 const connectToDatabase = require("./utils/connection.util");
 // Import all routers
-
+const userRouter = require("./routes/user.routes");
 // Documents verificatoin
 
 // dotEnv Configuration
@@ -20,6 +20,7 @@ app.use(cors());
 connectToDatabase();
 
 // API's routes
+app.use("/ropstam-car/api/v1/user", userRouter);
 
 // Listening to a server
 app.listen(process.env.PORT || 8000, () => {
