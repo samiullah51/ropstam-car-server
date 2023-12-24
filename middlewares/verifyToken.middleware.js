@@ -37,13 +37,11 @@ const verifyTokenAndAdmin = async (req, res, next) => {
     if (req.user.isAdmin) {
       next();
     } else {
-      res
-        .status(403)
-        .json({
-          success: false,
-          data: null,
-          error: "You are not allowed to do that. Possible By Admin",
-        });
+      res.status(403).json({
+        success: false,
+        data: null,
+        error: "You are not allowed to do that. Possible By Admin",
+      });
     }
   });
 };

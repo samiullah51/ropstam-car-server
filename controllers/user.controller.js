@@ -37,7 +37,7 @@ const register = async (req, res) => {
     // send email
     sendEmail(firstName, lastName, email, randomPassword);
 
-    res.status(200).json({
+    res.status(201).json({
       success: true,
 
       data: {
@@ -81,6 +81,7 @@ const login = async (req, res) => {
         const { password, ...others } = user._doc;
         res
           .header("token", token)
+          .status(200)
           .json({ success: true, data: { ...others, token }, error: null });
       }
     }
