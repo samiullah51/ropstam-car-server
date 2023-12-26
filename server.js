@@ -6,7 +6,7 @@ const connectToDatabase = require("./utils/connection.util");
 // Import all routers
 const userRouter = require("./routes/user.routes");
 const carRouter = require("./routes/car.routes");
-// Documents verificatoin
+
 
 // dotEnv Configuration
 dotenv.config();
